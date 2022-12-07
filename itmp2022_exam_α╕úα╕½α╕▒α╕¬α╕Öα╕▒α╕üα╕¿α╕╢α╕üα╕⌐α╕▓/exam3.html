@@ -1,0 +1,110 @@
+<!-- 
+
+10 คะแนน
+
+vue if คือการให้ element นั้นแสดงผล ก็ต่อเมื่อเงื่อนไขถูก
+เช่นหากใน data กำหนดให้ show = 1 แล้วเราต้องการให้แสดงกล่องนั้นเมื่อ show เป็น 1
+ให้เราเขียน v-if="show == 1" หรือหาก show มีค่าเป็น true/fals เราอาจเขียนเป็น v-if="show" ได้เลย หาก show มีค่าเป็น false หรือค่าอื่นๆ จะไม่แสดงผลบนหน้าเว็บ
+
+ในกรณที่ต้องการให้ element นั้นๆ มีบาง attribute โผล่ขึ้นมาในแท็ก เฉพาะเงื่อนไขตรง ก็สามารถใช้คำสั่ง :attribute="เงื่อนไข" ได้ เช่น
+
+<input :disabled="is_editable == `no`">
+
+จะทำให้ input นี้ไม่สามารถแก้ไขได้ถ้า data มี is_editable มีค่าเท่ากับ no เป็นต้น
+
+----
+vue for คือการทำให้มีการวนลูป สร้าง element นั้นๆ เรื่อยๆ
+เช่น <div v-for="data in studens">{{data}}</div> 
+วิวจะสร้าง div นี้ตามจำนวนชุดข้อมูลใน studens และสามารถเอา data มาใช้ได้เลย
+รวมถึงเอาไปใส่ใน attribute ด้วยก็ได้
+
+----
+ในไฟล์นี้มี section ทั้งหมด 3 section
+ให้นักศึกษาทำให้เมื่อกด tab ใดๆ แล้ว เนื้อหาแสดงเฉพาะ tab นั้นแสดงผล โดยใช้ vue for เพื่อสร้าง section และ tab ตามตัวอย่างโค้ดเริ่มต้นที่ให้มา หาก tab ไหนถูกกดอยู่ จะมี attribute active แสดงผลอยู่ด้วย ทำให้เป็นสีส้ม
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Vue If</title>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+	<style type="text/css">
+		.all_tabs{
+			display: flex;
+		}
+		.tab_item{
+			background: yellow;
+			padding: .5em;
+			margin-right: .5em;
+			cursor: pointer;
+		}
+		.tab_item[active]{
+			background: orange;
+		}
+		.content{
+			background: orange;
+			padding: 2em;
+		}
+	</style>
+</head>
+<body>
+	<div id="app">
+		<div class="all_tabs">
+			<!-- ด้านล่างนี้ให้เปลี่ยนไปใช้ v-for -->
+				<div v-for="i in tabs" class="tab_item" @click="change(i.id)" :active="i.id == active_tab">{{i.title}}</div>
+		</div>
+		<div class="all_tabs_content">
+			<!-- ด้านล่างนี้ให้เปลี่ยนไปใช้ v-for เพื่อแสดงผลทุกคอนเทนท์ในแต่ละแท็บ จากนั้นใช้ v-if เพื่อกำหนดว่าจะให้แท็บไหนแสดงผลหาก active_tab ตรงกับ id ของแท็บนั้นๆ -->
+			<div v-for="i in tabs" v-if="i.id === active_tab" class="content">
+				<h2	>{{i.title}}</h2>
+				<blockquote>
+					{{i.content}}
+				</blockquote>
+			</div>
+		</div>
+		
+	</div>
+	<script type="text/javascript">
+		let vue = new Vue({
+			el:'#app',
+			data:{
+				active_tab:0,
+				tabs:[
+				{
+					id:0,
+					title:`คำประกาศ`,
+					content:`“...มหาวิทยาลัยย่อมอุปมา ประดุจบ่อน้ำ บำบัดความกระหายของราษฎร ผู้สมัครแสวงหาความรู้ อันเป็นสิทธิและโอกาส ที่เขาควรมีควรได้ ตามหลักเสรีภาพของการศึกษา...”`
+				},
+				{
+					id:1,
+					title:`ความปราถนา`,
+					content:`"วันนี้เป็นวันแรกที่ฉันก้าวเข้าสู่การเป็นผู้ใหญ่ และในฐานะตัวแทนของเด็กทั่วโลก ฉันขอวิงวอนไปยังบรรดาผู้นำประเทศต่างๆ ให้ลงทุนในงบประมาณประเทศด้วยหนังสือแทนอาวุธ" มาลาลากล่าวเนื่องในวันเกิดอายุครบรอบ 18 ปีของเธอเมื่อวันที่ 11 กรกฎาคม
+					`
+				},
+				{
+					id:2,
+					title:`ถึงเพื่อนนักศึกษา`,
+					content:`“เพียงหวังจะเฟื่องฟุ้ง ฤาจึงมุ่งมาศึกษา เพียงเพื่อปริญญา เอาตัวรอดเท่านั้นฤา แท้ควรสหายคิด และตั้งจิตร่วมยึดถือ รับใช้ประชาคือ ปลายทางเราที่เล่าเรียน”`
+				},
+				{
+					id:3,
+					title:`จากครรภ์มารดาถึงเชิงตะกอน`,
+					content:`“ผมต้องการไปโรงเรียน พี่สาวหรือน้องสาวผมก็ต้องการไปโรงเรียนจะได้มีความรู้หากินได้ และจะได้รู้คุณธรรมแห่งชีวิต ถ้าผมมีสติปัญญาเรียนชั้นสูงๆ ขึ้นไป ก็ให้มีโอกาสเรียนได้ไม่ว่าพ่อแม่ผมจะรวยหรือจนจะอยู่ในเมืองหรือชนบทแร้นแค้น”`
+				}
+				]
+			},
+			methods: {
+				change(index) {
+					this.active_tab = index
+				}
+			},
+			
+		})
+	</script>
+	<script>
+		
+	</script>
+</body>
+</html>

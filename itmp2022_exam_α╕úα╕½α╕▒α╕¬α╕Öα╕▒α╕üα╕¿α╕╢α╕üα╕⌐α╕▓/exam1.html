@@ -1,0 +1,169 @@
+<!-- 
+
+5 คะแนน
+
+vue bind คือการเชื่อมระหว่าง data ที่อยู่ใน vue 2
+จากนั้นมาผูกกับข้อมูลบน element ใน attribute ที่เราต้องการ
+โดยการใช้คำสั่ง v-bind: หรือใช้เครื่องหมาย : นำหน้า attribute ที่เราต้องการ
+เพื่อให้เปลี่ยนไปตาม data ที่เกิดการเปลี่ยนแปลงใน vue 
+
+ในกรณีที่ต้องการเอาข้อความมาแสดงใน innerText สามารถใช้เครื่องหมาย {{datakey ที่ต้องการ}}
+ได้เลย
+
+ในขณะที่ v-model จะใช้กับแบบฟอร์ม ที่ไปผูกกับ data หากเรามีการแก้ไขข้อมูลในฟอร์ม data ก็จะเปลี่ยนไปด้วย เช่น <input v-model="student_name"> หากมีการแก้ไขข้อมูลฟอร์มนี้ data ที่มีคีย์ว่า student_name ก็จะเปลี่ยนไปด้วย และหากมีการไป bind ตรงไหน ก็จะเปลี่ยนตามทันที
+
+ให้นักศึกษาทดลองเอาแบบฟอร์มด้านล่าง มาผูกกับ data_key ให้สามารถทำเว็บไซต์แก้ไขแบบฟอร์มด้านล่าง โดยสร้าง datakey เองเพิ่มเติม และแก้ไขแบบฟอร์มเพิ่มเติม ให้ตรงกับที่โจทย์ต้องการ  
+
+
+-->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Vue Bind and Vue Model</title>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+	<style type="text/css">
+		body{
+			background: #f0f0fe;
+		}
+		.title{
+			text-align: center;
+			font-size: 1.2em;
+		}
+		.form_wrap{
+			display: flex;
+			max-width: 800px;
+			margin: auto;
+			margin-top: 2em;
+		}
+		.form_preview,.form_input{
+			width: 50%;
+			padding: 0 1em;
+		}
+		.form_preview{
+			box-shadow: 0px 0px 20px #0003;
+			border-radius: 10px;
+			background: #fff;
+		}
+		h5{
+			margin: 1em 0 .5em ;
+		}
+	</style>
+</head>
+<body>
+	<div id="app">
+		<div class="form_wrap">
+			<div class="form_preview">
+				<div class="paper">
+					<h1 class="title">แบบฟอร์มยืมของสโมสรนักศึกษา <br>คณะเทคโนโลยีสารสนเทศ สจล.</h1>
+					<h4>ชื่อ นามสกุล:<!-- แสดงชื่อ นามสกุลตรงนี้ -->{{name}}</h4>
+					<h4>รหัสนักศึกษา:<!-- แสดงรหัสนักศึกษาตรงนี้ -->{{stuid}}</h4>
+					<h4>ชั้นปีที่:<!-- แสดงรหัสชั้นปีที่ตรงนี้ -->{{year}}</h4>
+					<h4>เพื่อใช้ในกิจกรรม/งาน:<!-- แสดงชื่อกิจกรรมตรงนี้ -->{{purp}}</h4>
+					<h4>อุปกรณ์ที่ต้องการยืม:</h4>
+					<div>
+						<ul v-for="i in check.length-1">
+							<li v-model="check">
+								<p>{{check[i]}}</p>
+							</li>
+						</ul>
+						<!-- แสดงอุปกรณ์ที่ต้องการยืมตรงนี้ -->
+							<!-- 
+							#โบนัส
+							หากสามารถใช้ v-for ในการแสดงผลอุปกรณ์ที่ต้องการยืมเพื่อให้เป็นลิส
+							โดยใช้ ul list ได้ จะได้คะแนนเพิ่ม 5 คะแนน
+							โดยจะแสดงผลลักษณะแบบนี้
+							
+							• กรรไกร
+							• กระดาษแข็ง
+
+							เป็นต้น
+						-->
+					</div>
+					<h4>ระยะเวลาในการยืม 
+						<br/>{{dateget}} &ensp; {{daterec}} <!-- แสดงวันที่ยืม - คืน ในนี้ --></h4>
+				</div>
+			</div>
+			<div class="form_input">
+				<h3>กรอกแบบฟอร์มที่นี่</h3>
+				<h5>ชื่อ นามสกุล</h5>
+				<input v-model="name"s type="text" placeholder="ชื่อ นามสกุล">
+				<h5>รหัสนักศึกษา</h5>
+				<input v-model="stuid" type="text" placeholder="รหัสนักศึกษา">
+				<h5>ชั้นปี</h5>
+				<select v-model="year">
+					<option>ปี 1</option>
+					<option>ปี 2</option>
+					<option>ปี 3</option>
+					<option>ปี 4</option>
+				</select>
+				<h5>เพื่อใช้ในกิจกรรม/งาน</h5>
+				<input v-model="purp" type="text" placeholder="เพื่อใช้ในกิจกรรม/งาน">
+				<h5>อุปกรณ์ที่ต้องการยืม</h5>
+				<label>
+					<input v-model="check" type="checkbox" name="item" value="กรรไกร">
+					<span>กรรไกร</span>
+				</label>
+				<label>
+					<input v-model="check" type="checkbox" name="item" value="คัตเตอร์">
+					<span>คัตเตอร์</span>
+				</label>
+				<label>
+					<input v-model="check" type="checkbox" name="item" value="สกอตเทป">
+					<span>สกอตเทป</span>
+				</label>
+				<label>
+					<input v-model="check" type="checkbox" name="item" value="ปากกา">
+					<span>ปากกา</span>
+				</label>
+				<label>
+					<input v-model="check" type="checkbox" name="item" value="กระดาษแข็ง">
+					<span>กระดาษแข็ง</span>
+				</label>
+				<label>
+					<input v-model="check" type="checkbox" name="item" value="ฟิวเจอร์บอร์ด">
+					<span>ฟิวเจอร์บอร์ด</span>
+				</label>
+				<label>
+					<input v-model="check" type="checkbox" name="item" value="กาว">
+					<span>กาว</span>
+				</label>
+				<label>
+					<input v-model="check" type="checkbox" name="item" value="ไม้บรรทัด">
+					<span>ไม้บรรทัด</span>
+				</label>
+				<label>
+					<input v-model="check" type="checkbox" name="item" value="ที่ตัดกระดาษ">
+					<span>ที่ตัดกระดาษ</span>
+				</label>
+				<h5>วันที่ยืมของ</h5>
+				<input v-model="dateget" type="date" name="">
+				<h5>วันที่นัดหมายคืนของ</h5>
+				<input v-model="daterec" type="date" name="">
+			</div>
+		</div>
+
+	</div>
+	<script type="text/javascript">
+		let vue = new Vue({
+			el:'#app',
+			data:{
+				name: '',
+				stuid: '',
+				year: '',
+				purp: '',
+				check: [{}],
+				dateget: "",
+				daterec: "",
+			},
+		})
+	</script>
+	<script>
+		console.log(vue.check)
+		console.log(vue.dateget)
+	</script>
+</body>
+</html>

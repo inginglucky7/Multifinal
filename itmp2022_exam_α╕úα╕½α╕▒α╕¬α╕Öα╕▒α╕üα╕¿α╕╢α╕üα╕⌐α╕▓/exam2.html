@@ -1,0 +1,374 @@
+<!-- 
+
+15 คะแนน
+
+vue bind คือการเชื่อมระหว่าง data ที่อยู่ใน vue 2
+จากนั้นมาผูกกับข้อมูลบน element ใน attribute ที่เราต้องการ
+โดยการใช้คำสั่ง v-bind: หรือใช้เครื่องหมาย : นำหน้า attribute ที่เราต้องการ
+เพื่อให้เปลี่ยนไปตาม data ที่เกิดการเปลี่ยนแปลงใน vue เช่น 
+<h1 :data-title="site_title">ยินดีต้อนรับสู่ดินแดนแห่งความสงบ</h1> จะทำให้ attribute data-title เปลี่ยนไปตามค่าใน vue data ชื่อ site_title
+
+โดยเราสามารถใช้วิธีการเปลี่ยนค่าได้ตั้งแต่การใช้ methods ของ vue2 หรือใช้เพียงแค่ javascript ง่ายๆ โดยเรียกตัวแปลที่เราประกาศ vue2 เอาไว้ แล้วเปลี่ยนค่าตรงๆ เช่นในไฟล์นี้ประกาศไว้ว่าชื่อ vue
+หากนักศึกษาลองเขียนโค้ดว่า 
+vue.site_title = 'อะไรก็ได้' 
+แล้วนำไปรันใน console จะพบว่า attribute ชื่อ data-title บนเว็บจะเปลี่ยนไป
+หากเรานำเอาไปใส่ใน onclick จะทำให้เวลาคลิกแล้ว site_title ของวิวจะเปลี่ยนไป ทำให้ attribute นั้นเปลี่ยนตามไปด้วย
+
+
+-----
+
+CSS Attribute คือการเอา attribute มาเป็น selector ในการเปลี่ยนค่าต่างๆ
+เช่น <h1 data-type="main_color">สวัสดี</h1> จะเรียกใน css แบบนี้
+
+h1[data-type="main_color"]{
+	color:pink
+}
+
+แบบนี้ element ดังกล่าวจะเป็นสีชมพู ในขณะที่ h1 อื่นๆ ที่ไม่มี data-type="main_color" จะไม่เข้าเงื่อนไข
+
+ให้นักศึกษาดูโค้ดด้านล่าง แล้วทำให้เมื่อกดปุ่มแล้ว เปลี่ยนจากกลางวันเป็นกลางคืน เปลี่ยนจากกลางคืนเป็นกลางวัน และเมื่อกดเปลี่ยนภาพพื้นหลัง ภาพพื้นหลังจะเปลี่ยนไปตามไฟล์ในโฟลเดอร์ exam2 จำนวน 3 ภาพไปเรื่อยๆ
+
+-----
+
+#คำแนะนำ
+นักศึกษาควรอ่าน CSS ด้านล่าง ว่าตรงไหนที่มีการใช้ css attribute จากนั้นให้ลองนำเอา attribute และ value นั้นๆ ไปใส่ใน element ที่ถูกต้อง หากเข้าเงื่อนไข จะกลายเป็นกลางคืน
+
+จากนั้นลองเขียน vue และ binding attribute นั้นเข้ากับ vue ที่ทำเอาไว้
+แล้วจึงเขียน onclick เพื่อให้มีการเปลี่ยนแปลงค่าไปมาได้
+
+-->
+
+<html>
+<head>
+	<title>Vue Bind Attribute</title>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+	<style>
+		body{
+			background:#333;
+			margin:0;
+			font-family:sans-serif;
+		}
+		#my_picture{
+			width:600px;
+			height:400px;
+			background:#fff;
+			margin:auto;
+			margin-top:calc(50vh - 200px);
+			border-radius:5px;
+			overflow:hidden;
+			box-shadow:0px 10px 20px #0003;
+			position:relative;
+			perspective:1000px;
+			transition:background .3s;
+		}
+		#sky_wheel{
+			background:linear-gradient(to bottom,
+				hsl(60,100%,50%),
+				hsl(30,100%,50%) 50%,
+				hsl(280,100%,50%) 50%,
+				hsl(230,100%,50%)
+			);
+			width:100%;
+			padding-top:100%;
+			border-radius:100%;
+			position:absolute;
+			left:0;
+			bottom:-300px;
+			z-index:10;
+			transform:rotate(0deg);
+			transition:all 1s;
+		}
+		#moon{
+			background:hsl(60,100%,90%);
+			box-shadow:0px 0px 30px hsl(60,100%,90%);
+			--w:100px;
+			width:var(--w);
+			height:var(--w);
+			position:absolute;
+			left:calc(50% - (var(--w)/2));
+			border-radius:100%;
+			bottom:50px;
+			transition:bottom 1s .4s;
+		}
+
+		#sun{
+			--w:100px;
+			position:absolute;
+			left:calc(50% - (var(--w)/2));
+			top:50px;
+			animation:sun 10s infinite linear;
+			transform:rotate(0deg);
+			transition:top 1s .4s;
+		}
+
+		.sun_ray{
+			background:hsl(30,100%,50%);
+			background-image:radial-gradient(hsl(40,100%,50%) 40%,hsl(20,100%,50%));
+			background-size:cover;
+			width:calc(var(--w) - 10px);
+			height:calc(var(--w) - 10px);
+			position:absolute;
+			left:5px;
+			top:5px;
+		}
+		.sun_ball{
+			background:hsl(60,95%,70%,0.6);
+			box-shadow:0px 0px 10px hsl(60,95%,70%,50%);
+			width:var(--w);
+			height:var(--w);
+			border-radius:100%;
+			position:relative;
+		}
+		.star{
+			--w:30px;
+			position:absolute;
+			left:100px;
+			bottom:100px;
+			width:var(--w);
+			height:var(--w);
+		}
+		.star_x,.star_y{
+			width:100%;
+			height:100%;
+			position:absolute;
+		}
+		.star_x{
+			transform:scaleX(.2);
+		}
+		.star_y{
+			transform:rotate(90deg) scaleX(.2) scaleY(.6);
+		}
+		.star_x::before,.star_y::before{
+			content:" ";
+			width:100%;
+			height:100%;
+			background:#fff;
+			box-shadow:0px 0px 10px #fff;
+			transform:rotate(45deg);
+			position:absolute;
+		}
+		@keyframes sun{
+			from{
+				transform:rotate(0deg)}
+				to{
+					transform:rotate(360deg)}
+				}
+				.s1{
+					left:unset;
+					right:100px;
+					bottom:50px;
+					animation:star 1.23s .5s infinite alternate;
+				}
+				.s2{
+					left:unset;
+					right:200px;
+					bottom:200px;
+					transform:scale(.6);
+					animation:star 0.68s .456s infinite alternate;
+				}
+				.s3{
+					left:unset;
+					bottom:200px;
+					transform:scale(.6);
+					animation:star 0.96s .94s infinite alternate;
+				}
+				.s4{
+					transform:scale(1.2);
+					animation:star 1.5s infinite alternate;
+				}
+
+
+				@keyframes star{
+					from{opacity:1}
+					to{opacity:0}
+				}
+				.land{
+					width:100%;
+					height:200px;
+					/*         background:#0002; */
+					position:absolute;
+					bottom:0;
+					left:0;
+					z-index:10;
+					font-size:100px;
+					font-weight:bold;
+					display:flex;
+					justify-content:center;
+					align-items:flex-end;
+					color:white;
+					line-height:70px;
+					transform-style:preserve-3d;
+					transform-origin:bottom;
+					transform:rotatex(100deg);
+					transition:all 1s .5s;
+				}
+				#toggle_1{
+					position:fixed;
+					bottom:1em;
+					right:8em;
+					background:#fff;
+					padding:.5em;
+					border-radius:4px;
+					cursor:pointer;
+				}
+				#toggle_2{
+					position:fixed;
+					bottom:1em;
+					right:1em;
+					background:#fff;
+					padding:.5em;
+					border-radius:4px;
+					cursor:pointer;
+				}
+				#my_picture #moon{
+					bottom:-150px;
+				}
+				#my_picture .land.-day{
+					transform:rotatex(0deg);
+				}
+				#my_picture .land.-night{
+					transform:rotatex(-180deg);
+				}
+				#my_picture{
+					background:hsl(200,100%,70%);
+				}
+				.title{
+					text-align: center;
+					color: #fff;
+					transition: all .3s;
+					position: absolute;
+					top: 0;
+					width: 100%;
+				}
+
+				.bg{
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+					mix-blend-mode: overlay;
+					transition: all .3s;
+				}
+
+				#my_picture[data-day="-1"] .title{
+					top: 2em;
+				}
+				#my_picture[data-day="-1"] .title{
+					top: 1em;
+				}
+
+				#my_picture[data-day="-1"] #sky_wheel{
+					transform:rotate(180deg);
+				}
+				#my_picture[data-day="-1"] #sun{
+					top:-150px;
+				}
+				#my_picture[data-day="-1"] .land.-day{
+					transform:rotatex(180deg);
+				}
+				#my_picture[data-day="-1"] .land.-night{
+					transform:rotatex(0deg);
+				}
+				#my_picture[data-day="-1"]{
+					background:hsl(260,80%,20%);
+				}
+
+				
+			</style>
+		</head>
+		<body>
+			<div :data-day=dn id="my_picture">
+				<!-- ใส่ attribute ให้ถูกต้องในแท็กด้านบน หา attribute จาก css ข้างบน-->
+
+				<img :src="bg[bgval]" class="bg">
+				<!-- สร้าง data เพื่อ binding แท็กด้านบนเข้ากับ src ที่ถูกต้อง (ตรงนี้อาจต้องใช้มากกว่า 1 data) มีหลายวิธี -->
+
+				<h1 :data-title="site_title" class="title">ยินดีต้อนรับสู่ดินแดนแห่งความสงบ</h1>
+
+				<div id="sky_wheel">
+					<div class="star s1 ">
+						<div class="star_x">
+						</div>
+						<div class="star_y">
+						</div>
+					</div>
+					<div class="star s2">
+						<div class="star_x">
+						</div>
+						<div class="star_y">
+						</div>
+					</div>
+					<div class="star s3">
+						<div class="star_x">
+						</div>
+						<div class="star_y">
+						</div>
+					</div>
+					<div class="star s4">
+						<div class="star_x">
+						</div>
+						<div class="star_y">
+						</div>
+					</div>
+					<div id="moon">
+					</div>
+					<div id="sun">
+						<div class="sun_ray">
+						</div>
+						<div class="sun_ray" style="transform:rotate(30deg)">
+						</div>
+						<div class="sun_ray" style="transform:rotate(60deg)">
+						</div>
+						<div class="sun_ball">
+						</div>
+					</div>
+				</div>
+				<!-- end sky_wheel -->
+				<div class="land -day">
+					<div class="landtext">
+						DAY
+					</div>
+				</div>
+				<div class="land -night">
+					<div class="landtext">
+						NIGHT
+					</div>
+				</div>
+			</div>
+
+			<!-- เขียนคำสั่ง onclick ให้ถูก ต้องใช้ js เขียนเพราะอยู่นอก #my_picture -->
+			<div id="toggle_1" onclick="togtime()">
+				<!-- คลิกแล้วเปลี่ยนกลางวันเป็นกลางคืนเรื่อยๆ ใช้ความรู้คณิตศาสตร์-->
+				Toggle Time
+			</div>
+			<div id="toggle_2" onclick="togbg()">
+				<!-- คลิกแล้วเปลี่ยนพื้นหลังเรื่อยๆ ใช้ความรู้คณิตศาสตร์ ใช้วิธีการ mod เพื่อให้วน 0-1-2 เรื่อยๆ ได้-->
+				Toggle BG
+			</div>
+
+			<script type="text/javascript">
+				let vue = new Vue({
+					el:'#my_picture',
+					data:{
+						site_title:"Multimedia Programming",
+						bg: ["exam2/1.jpg", "exam2/2.jpg", "exam2/3.jpg"],
+						dn: 1,
+						bgval: 0,
+					},
+					methods: {
+						
+					},
+				})
+			</script>
+			<script>
+				function togtime() {
+					vue.dn *= -1
+					console.log(vue.dn)
+				}
+
+				function togbg() {
+					vue.bgval = (vue.bgval+1)%3
+					console.log(vue.bg)
+				}
+			</script>
+		</body>
+		</html>
